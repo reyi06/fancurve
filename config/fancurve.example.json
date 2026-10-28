@@ -1,0 +1,48 @@
+{
+  "$schema": "./fancurve.schema.json",
+  "version": 1,
+  "pollSeconds": 2,
+  "modeRefreshSeconds": 30,
+  "statusLogSeconds": 60,
+  "provider": "auto",
+  "pauseOnTurboMode": true,
+  "logLevel": "info",
+  "fans": {
+    "cpu": 1,
+    "gpu": 4
+  },
+  "cpu": {
+    "curve": [
+      { "temp": 50, "percent": 30 },
+      { "temp": 85, "percent": 100 }
+    ],
+    "smoothing": 0.2,
+    "maxStepUp": 3,
+    "maxStepDown": 2,
+    "emergencyTemp": 88
+  },
+  "gpu": {
+    "curve": [
+      { "temp": 56, "percent": 40 },
+      { "temp": 62, "percent": 60 },
+      { "temp": 72, "percent": 100 },
+      { "temp": 100, "percent": 100 }
+    ],
+    "hysteresis": {
+      "enter": 62,
+      "exit": 56,
+      "lowPercent": 30
+    },
+    "smoothing": 1.0,
+    "maxStepUp": 8,
+    "maxStepDown": 2,
+    "emergencyTemp": 75
+  },
+  "safety": {
+    "minPercent": 30,
+    "maxPercent": 100,
+    "fallbackPercent": 70,
+    "failureThreshold": 6,
+    "restoreAutoOnExit": true
+  }
+}

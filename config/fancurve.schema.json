@@ -1,0 +1,185 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://raw.githubusercontent.com/reyi06/fancurve/main/config/fancurve.schema.json",
+  "title": "FanCurve configuration",
+  "description": "Configuration for the FanCurve Acer fan controller.",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "version": {
+      "const": 1
+    },
+    "pollSeconds": {
+      "type": "number",
+      "minimum": 1,
+      "maximum": 60,
+      "default": 2
+    },
+    "modeRefreshSeconds": {
+      "type": "number",
+      "minimum": 5,
+      "maximum": 600,
+      "default": 30
+    },
+    "statusLogSeconds": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 3600,
+      "default": 60
+    },
+    "provider": {
+      "type": "string",
+      "enum": ["auto", "acer-wmi", "nitrosense"],
+      "default": "auto"
+    },
+    "pauseOnTurboMode": {
+      "type": "boolean",
+      "default": true,
+      "description": "Pause while the firmware is in Turbo/Max mode."
+    },
+    "logLevel": {
+      "type": "string",
+      "enum": ["debug", "info", "warn", "error"],
+      "default": "info"
+    },
+    "fans": {
+      "type": "object",
+      "properties": {
+        "cpu": {
+          "type": ["integer", "null"],
+          "minimum": 0,
+          "maximum": 255,
+          "default": 1
+        },
+        "gpu": {
+          "type": ["integer", "null"],
+          "minimum": 0,
+          "maximum": 255,
+          "default": 4
+        }
+      },
+      "additionalProperties": false
+    },
+    "cpu": {
+      "$ref": "#/definitions/fan"
+    },
+    "gpu": {
+      "$ref": "#/definitions/fan"
+    },
+    "safety": {
+      "type": "object",
+      "properties": {
+        "minPercent": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "default": 30
+        },
+        "maxPercent": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "default": 100
+        },
+        "fallbackPercent": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "default": 70
+        },
+        "failureThreshold": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 60,
+          "default": 6
+        },
+        "restoreAutoOnExit": {
+          "type": "boolean",
+          "default": true
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": true,
+  "definitions": {
+    "curvePoint": {
+      "type": "object",
+      "required": ["temp", "percent"],
+      "properties": {
+        "temp": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 120
+        },
+        "percent": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        }
+      },
+      "additionalProperties": false
+    },
+    "curve": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "$ref": "#/definitions/curvePoint"
+      }
+    },
+    "fan": {
+      "type": "object",
+      "required": ["curve", "smoothing", "maxStepUp", "maxStepDown", "emergencyTemp"],
+      "properties": {
+        "curve": {
+          "$ref": "#/definitions/curve"
+        },
+        "smoothing": {
+          "type": "number",
+          "minimum": 0.01,
+          "maximum": 1
+        },
+        "maxStepUp": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "maxStepDown": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "emergencyTemp": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 120
+        },
+        "hysteresis": {
+          "type": "object",
+          "required": ["enter", "exit", "lowPercent"],
+          "properties": {
+            "enter": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 120
+            },
+            "exit": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 120
+            },
+            "lowPercent": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

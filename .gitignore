@@ -1,0 +1,24 @@
+# Runtime data
+logs/
+config/fancurve.json
+*.log
+*.log.*
+
+# Test output
+testResults/
+*.pester.xml
+coverage.xml
+
+# Editors
+.vscode/
+.idea/
+*.swp
+
+# OS
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# PowerShell
+*.tmp
+*.bak

@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: PowerShell tests
+    runs-on: windows-latest
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Install Pester
+        shell: pwsh
+        run: |
+          Install-Module Pester -RequiredVersion 5.7.1 -Scope CurrentUser -Force -SkipPublisherCheck -ErrorAction Stop
+
+      - name: Parse PowerShell files
+        shell: pwsh
+        run: |
+          $failed = $false
+          $files = Get-ChildItem -Path . -Recurse -File -Include *.ps1,*.psm1,*.psd1
+          foreach ($file in $files) {
+              $tokens = $null
+              $errors = $null
+              [System.Management.Automation.Language.Parser]::ParseFile($file.FullName, [ref]$tokens, [ref]$errors) | Out-Null
+              foreach ($error in $errors) {
+                  Write-Host ("{0}:{1}:{2} {3}" -f $file.FullName, $error.Extent.StartLineNumber, $error.Extent.StartColumnNumber, $error.Message)
+                  $failed = $true
+              }
+          }
+          if ($failed) { throw 'PowerShell parse errors were found.' }
+
+      - name: Run tests
+        shell: pwsh
+        run: |
+          Invoke-Pester -Path ./tests -CI -Output Detailed
